@@ -10,18 +10,17 @@ export async function POST(request: NextRequest) {
     try {
         const reqBody = await request.json();
         const { username, email, password } = reqBody;
-        console.log("Received signup request:", reqBody);
 
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email });
 
         if (user) {
             return NextResponse.json(
-                { error: "User already exists" },
+                { error: "User already exists", success: false },
                 { status: 400 }
-            ); 
+            );
         }
 
-        const salt = await bcrypt.genSalt(10)
+        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = await User.create({
@@ -30,20 +29,19 @@ export async function POST(request: NextRequest) {
             password: hashedPassword,
         });
 
-        console.log("New user created:", newUser);
-
         // Send welcome email
         await sendEmail({ email, emailType: "verify", userId: newUser._id });
 
         return NextResponse.json({
             message: "User registered successfully",
             success: true,
-            newUser
+            newUser,
         });
     } catch (error: any) {
         return NextResponse.json(
             {
                 error: error.message || "An error occurred during signup",
+                success: false,
             },
             {
                 status: 500,
