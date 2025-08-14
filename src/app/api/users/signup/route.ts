@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
         const reqBody = await request.json();
         const { username, email, password } = reqBody;
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ $or: [{ email }, { username }] });
 
         if (user) {
             return NextResponse.json(

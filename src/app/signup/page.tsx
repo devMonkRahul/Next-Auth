@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function page() {
+export default function SignupPage() {
   const router = useRouter();
 
   const [user, setUser] = useState({
@@ -24,12 +24,13 @@ export default function page() {
 
       const response = await axios.post("/api/users/signup", user);
       console.log("Signup response:", response.data);
+      toast.success("Signup successful! Please check your email to verify your account.");
 
       router.push("/login");
 
     } catch (error: any) {
       console.error("Error during signup:", error);
-      toast.error(error.message);
+      toast.error(error.response.data.error || "An error occurred during signup.");
     } finally {
       setLoading(false);
     }
